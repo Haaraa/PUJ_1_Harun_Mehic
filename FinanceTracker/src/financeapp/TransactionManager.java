@@ -4,9 +4,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
 import java.util.ArrayList;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class TransactionManager {
+
     private final MongoCollection<Document> collection;
 
     public TransactionManager() {
@@ -20,29 +25,34 @@ public class TransactionManager {
 
     public ArrayList<Transaction> getAllTransactions() {
         ArrayList<Transaction> list = new ArrayList<>();
-        MongoCursor<Document> cursor = collection.find().iterator();
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
 
-        while (cursor.hasNext()) {
-            Document d = cursor.next();
+                ObjectId id = d.getObjectId("_id");
+                String type = d.getString("Vrsta");
+                String category = d.getString("Kategorija");
+                Number amountNum = (Number) d.get("Iznos");
+                double amount = amountNum.doubleValue();
+                String description = d.getString("Opis");
 
-            String type = d.getString("Vrsta");
-
-            // SIGURNO čitanje iznosa — bez više NullPointer grešaka
-            Object rawAmount = d.get("Iznos");
-            double amount = 0.0;
-
-            if (rawAmount instanceof Number) {
-                amount = ((Number) rawAmount).doubleValue();
-            } else if (rawAmount instanceof String) {
-                try { amount = Double.parseDouble((String) rawAmount); }
-                catch (Exception ignored) {}
+                list.add(new Transaction(id, type, category, amount, description));
             }
-
-            String description = d.getString("Opis");
-
-            list.add(new Transaction(type, amount, description));
         }
         return list;
+    }
+
+    public void updateTransaction(Transaction t) {
+        Document updated = new Document("Vrsta", t.getType())
+                .append("Kategorija", t.getCategory())
+                .append("Iznos", t.getAmount())
+                .append("Opis", t.getDescription());
+
+        collection.updateOne(eq("_id", t.getId()), new Document("$set", updated));
+    }
+
+    public void deleteTransaction(ObjectId id) {
+        collection.deleteOne(eq("_id", id));
     }
 
     public double getTotalIncome() {
