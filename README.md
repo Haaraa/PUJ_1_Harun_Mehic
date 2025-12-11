@@ -67,4 +67,67 @@ Prevoz: 150
 Zabava: 100
 Racuni: 450
 
+Instalacija i pokretanje aplikacije 
+
+-Instalirati i pokrenuti MongoDB Community Server 
+
+MongoDB treba biti instaliran i pokrenut na default portu 27017. 
+Provjera: 
+mongosh 
+Ako se otvori Mongo shell > MongoDB radi ispravno. 
+
+  
+-Klonirati projekat 
+git clone https://github.com/USERNAME/FinanceApp.git 
+
+  
+-Otvoriti projekat u IntelliJ IDEA 
+– File  > Open 
+– Izabrati folder projekta 
+– IntelliJ automatski prepoznaje Java projekt 
+
+  
+-Pokrenuti aplikaciju 
+Pokreće se klasa Main.java 
+Nakon pokretanja otvara se GUI aplikacije. 
+  
+
+-Struktura projekta:
+ 
+src/ financeapp/
+-Main.java
+-FinanceTrackerForm.java
+-FinanceTrackerForm.form
+-Transaction.java
+-TransactionManager.java
+-MongoDBConnection.java 
+
+  
+Arhitektura projekta 
+
+Transaction 
+– Model transakcije (ID, vrsta, kategorija, iznos, opis)  
+
+
+TransactionManager 
+– Dodavanje transakcije 
+– Ažuriranje postojeće transakcije 
+– Brisanje transakcije 
+– Dohvat svih transakcija 
+– Izračun prihoda i rashoda 
+
+
+FinanceTrackerForm 
+– GUI sloj 
+– Prikaz i unos transakcija 
+– Ažuriranje i brisanje 
+– Export u TXT 
+– Prikaz salda 
+
+
+MongoDBConnection 
+– Centralizovana konekcija prema MongoDB serveru 
+
+  
+
 
